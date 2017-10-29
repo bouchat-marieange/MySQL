@@ -1,0 +1,2 @@
+# MySQL
+Exercices Parcours MySQL
