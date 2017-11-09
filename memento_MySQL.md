@@ -126,13 +126,13 @@ La clause "Where" est facultative. Elle permet de spécifier quelles valeurs ou 
 
 La partie conditionnelle (juste après WHERE) peut utiliser ces opérateurs:
 
-=	"égal à"
->	"plus grand que"
-<	"plus petit que"
->=	"plus grand ou égal à"
-<=	"plus petit ou égal à"
-<>	"différent de"
-LIKE "qui ressemble à"
+* =	"égal à"
+* >	"plus grand que"
+* <	"plus petit que"
+* >=	"plus grand ou égal à"
+* <=	"plus petit ou égal à"
+* <>	"différent de"
+* LIKE "qui ressemble à"
 
 Like permet de retourner des rangées qui "ressemblent à " une chaîne de caractère que tu spécifies, accompagnée du signe %, signe voulant dire "n'importe quel chaîne de caractère".
 
