@@ -13,7 +13,7 @@
 
     <h1>MySQL</h1>
 
-    <h2>Exercices SELECT</h2>
+    <h2>Exercices SELECT - Drill 1</h2>
 
     <p>Exercice réalisé dans le bac à sable à l'adresse : http://sqlfiddle.com/#!9/6ddfd/2</p>
 
