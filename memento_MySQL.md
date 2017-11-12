@@ -144,6 +144,28 @@ Pour un ordinateur cela signifie soit:
 
 C'est très utile pour ajouter une fonctionnalité de rechercher dans votre application. Pour des exemples lire plus d'infos ici: [http://www.sqlcourse.com/select.html]
 
+### TRIER : ORDER BY
+
+On peut demander à MySQL de trier les résultats selon un ordre que l'on définit, en ajoutant à la fin de la requête ORDER BY suivi de la colonne à utiliser pour le tri, suivi soit de ASC ("ascendint order" de A à Z par exemple, ou de la plus petite valeur à la plus grande) ou de DESC ("descending order", de Z à A ou de la plus grande valeur à la plus petite)
+
+Exemple:
+
+````MySQL
+SELECT ville FROM météo ORDER BY ville ASC;
+````
+
+### Limiter le nombre de résultats
+
+On peut demander à MySQL de limiter le nombre de résultats, en ajoutnat le mot clef LIMIT suivi de la rangée de départ (on commence à O) puis une virgule, puis le nombre de rangées à garder.
+
+Par exemple, pour ne garder que la rangée du dessus, on ajoute LIMIT 0,1 à la requête:
+
+````MySQL
+SELECT ville FROM météo ORDER BY ville ASC LIMIT 0,1 ;
+````
+
+
+
 
 
 
