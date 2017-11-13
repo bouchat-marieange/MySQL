@@ -31,13 +31,57 @@
 
       <h4>Le tableau</h4>
 
+      CREATE TABLE Météo
+        (`ville` varchar(9), `haut` int, `bas` int)
+      ;
 
+      INSERT INTO Météo
+        (`ville`, `haut`, `bas`)
+      VALUES
+        ('Bruxelles', 27, 13),
+        ('Liège', 25, 15),
+        ('Namur', 26, 15),
+        ('Charleroi', 25, 12),
+        ('Bruges', 28, 16),
+        ('Chênée', 26, 14)
+      ;
 
       <h4>La réquête SQL</h4>
 
+        CREATE TABLE Météo
+          (`ville` varchar(9), `haut` int, `bas` int)
+        ;
 
+        INSERT INTO Météo
+          (`ville`, `haut`, `bas`)
+        VALUES
+          ('Bruxelles', 27, 13),
+          ('Liège', 25, 15),
+          ('Namur', 26, 15),
+          ('Charleroi', 25, 12),
+          ('Bruges', 28, 16),
+          ('Chênée', 26, 14)
+        ;
+
+
+          SELECT
+          ville,
+          haut,
+          bas
+          FROM
+          Météo
+          ;
 
       <h4>Le résultat</h4>
+
+      |     ville | haut | bas |
+      |-----------|------|-----|
+      | Bruxelles |   27 |  13 |
+      |     Liège |   25 |  15 |
+      |     Namur |   26 |  15 |
+      | Charleroi |   25 |  12 |
+      |    Bruges |   28 |  16 |
+      |    Chênée |   26 |  14 |
 
     </p>
 

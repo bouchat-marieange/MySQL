@@ -235,6 +235,24 @@ VALUES
 ;
 ````
 
+## Update : UPDATE
+
+UPDATE te permet de mettre à jour une ou plusieurs rangées correspondant à une condition (clause WHERE)
+
+````MySQL
+UPDATE nom_de_la_table
+SET nom_de_colonne = "nouvelle valeur"
+WHERE nom_de_colonne OPERATEUR "valeur" 
+	[and|or nom_de_colonne OPERATEUR "value"];
+
+[ ] = optionnel
+````
+
+**Note:** n'oublie pas la clause WHERE quand tu UPDATE, sinon TOUTES les rangées de la table seront mises à jour!
+
+
+## Delete : DELETE FROM
+
 
 
 
