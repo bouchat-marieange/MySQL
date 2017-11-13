@@ -195,6 +195,50 @@ SELECT COUNT(*) FROM météo WHERE ville='Bruxelles';
 Pour en savoir plus sur ces fonctions, va voir sur [openclassrooms](https://openclassrooms.com/courses/concevez-votre-site-web-avec-php-et-mysql/les-fonctions-sql)
 
 
+### Aller plus loin par toi-même
+
+Si vous désirez aller plus loin dans votre connaissance de SQL ,voici quelques ressources bien faites:
+
+* Utiliser les fonctions SQL, sur [openclassrooms](https://openclassrooms.com/courses/concevez-votre-site-web-avec-php-et-mysql/les-fonctions-sql)
+* Les bases du Select, expliqué par sqlcourse.com: [Basics of Select](http://www.sqlcourse.com/select.html)
+* Trucs et astuces avec Select, expliqué par sqlcourse.com: [Powerful things to do with Select](http://www.sqlcourse2.com/select2.html)
+
+
+## CREATE : INSERT INTO
+
+Régulièrement, tes tables vont recevoir de nouvelles rangées. Par exemple si on reprend les infos météorologiquen un jour la ville d'Arlon peut vouloir être ajoutée à ton application. Il va donc falloir l'inscrire et créer son compte.
+
+En SQL, cela signifie simplement que l'application aura **ajouté une rangée en bas du tableau** en lui fournissant les informations à insérer dans les colonnes.
+
+### Syntaxe INSERT INTO
+
+Pour insérer des enregistrements dans une table, écris INSERT INTO suivi du nom de la table, suivi d'une parenthèse ouverte, suivie d'une liste de noms de colonnes séparés par des virgules, suivi d'une parenthèse fermée suivie par VALUES, suivi de la liste des valeurs entre parenthèses dans le même ordre que l'ordre des colonnes, séparées d'une virgules entre chaque valeur. Les valeurs que vous entrez sront conservées dans les rangées et elles correspondront aux noms de colonne que vous spécifiez. Chque chaîne de caractères doit être mise entre guillemets simples.
+ex: 'chaîne de caractères', mais pas les nombres. Ex: 28
+
+````MySQL
+INSERT INTO nom_de_la_table
+	(colonne1, colonne2, colonne3... dernière_colonne)
+VALUES
+	(value_colonne_1, value_colonne2, ... value_dernière_colonne)
+;
+````
+
+**Note :** Chaque chaîne de caractère doit être mise entre guillemets simples. ex 'chaine de caractères'
+
+Donc, dans notre exemple de la météo, ajoutons une rangée pour Arlon, où le maxima est 34 et le minima est 11.
+
+````MySQL
+INSERT INTO Météo
+    (ville, haut, bas)
+VALUES
+    ('Arlon', 34, 11)
+;
+````
+
+
+
+
+
 
 
 
