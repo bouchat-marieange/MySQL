@@ -164,6 +164,36 @@ Par exemple, pour ne garder que la rangée du dessus, on ajoute LIMIT 0,1 à la 
 SELECT ville FROM météo ORDER BY ville ASC LIMIT 0,1 ;
 ````
 
+### Bonus : SQL inclut des fonctions utiles
+
+Voici 2 fonctions que l'on utilise souvent en SQL "concat" et "count", mais il en existe de nombreuses autres.
+
+**concat**
+
+Cette fonction permet de concaténer des colonnes pour recevoir un tableau plus facile à traiter ensuite en PHP.
+
+````MySQL
+SELECT CONCAT('ville: ', ville, ': ', bas, '/', haut ) FROM météo;
+````
+
+**count**
+
+Tu veux savoir combien il y a de villes dans le tableau? Tu peux simplement le demander via SQL en utilisant la fonction COUNT()
+
+````MySQL
+SELECT COUNT(*) FROM météo;
+````
+
+**count + where**
+
+Si on veut vérifier qu'il n'y a pas eu une double entrée pour Bruxelles, on utilise COUNT() et une clause WHERE pour savoir le nombre de fois que "Bruxelles' se trouve dans la table météo.
+
+````MySQL
+SELECT COUNT(*) FROM météo WHERE ville='Bruxelles';
+````
+
+Pour en savoir plus sur ces fonctions, va voir sur [openclassrooms](https://openclassrooms.com/courses/concevez-votre-site-web-avec-php-et-mysql/les-fonctions-sql)
+
 
 
 
