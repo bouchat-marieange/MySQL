@@ -253,11 +253,128 @@ WHERE nom_de_colonne OPERATEUR "valeur"
 
 ## Delete : DELETE FROM
 
+DELETE FROM permet de supprimer des données dans la DB.
+
+````mySQL
+DELETE from nom_de_la_table
+WHERE nom_de_colonne OPERATEUR "valeur" 
+[and|or "nom_de_colonne" OPERATEUR "valeur"];
+
+[ ] = optionnel
+````
+
+**Note:** n'oublie pas la clause WHERE quand tu DELETE, sinon TOUTES les rangées de la table seront effacées!
 
 
+## Vole de tes propres ailes
+
+Réalise le quizz SQL de la W3School pour vérifier tes connaissances fraîchement acquises
+
+Si le quizz se passe bien pas à l'étape d'installation de LAMP sur ta machine en suivant cette procédure:
+
+## Installer MySQL sur ta machine
+
+### Installer LAMP sur Ubuntu
 
 
+https://github.com/becodeorg/BeCode.wiki.git
 
+Voici comment créer un environnement de développement complet, incluant le combo LAMP:
+
+**L**inux (déjà là puisque Ubuntu est une distribution de Linux)
+**A**pache (le serveur web)
+**M**ySQL (le serveur de bases de données)
+**P**HP (logiciel Middleware (comparable à python, ruby, asp, ...)
+
+1. Vérifie que ton système est à jour
+````code
+sudo apt-get update
+````
+
+2. Installe le package complet
+````code
+sudo apt-get install lamp-server^ (n'oublie pas l'accent circonflexe!)
+````
+
+3. Il y aura une invitation à indiquer un mot de passe pour mysql. Indique "user" ou choisis-en un autre mais alors, note le quelque part où tu le retrouveras facilement en temps utile (evernote, google docs...) .
+
+4. Teste que ton serveur Apache fonctionne en allant sur http://localhost/
+
+5. Teste que PHP fonctionne en créant un fichier :
+````code
+sudo touch /var/www/html/info.php
+sudo nano /var/www/html/info.php
+````
+
+6. Mets ceci dans le fichier:
+
+````php
+<?php 
+/* 
+Cette fonction génère une liste renseignant 
+pleins d'infos utiles sur ta version de PHP et sa configuration.
+*/
+phpinfo();  
+
+````
+7. CTRL+X pour quitter nano
+
+8. Teste en visitant http://localhost/info.php Tu devrais voir la page d'info de PHP. Il te permet également de voir où se trouve le fichier de configuration de php (php.ini) pour le cas où tu as besoin de le modifier.
+
+9. Voilà! Par défaut, Apache "sert" le dossier se trouvant à /var/www/html/ . Autrement dit, quand tu tapes http://localhost/dans ton navigateur, tu accèdes à tout ce qui se trouve dans le dossier /var/www/html/. C'est pour cela que l'on parle de "serveur web": un logiciel qui sert le contenu d'un dossier via une adresse URL. Comme eux:
+
+## Serveurs
+
+### Gestion des permissions
+
+1. Il faut à présent donner des droits d'écriture, de lecture et d'exécution suffisant dans le dossier servi par le serveur Apache à son utilisateur (normalement il s'appelle : www-data) sudo chown -R www-data:www-data /var/www/.
+2. Spécifie les droits de lecture (R), d' écriture (W) et d'exécution (X) pour ce dossier et tous ses fichiers et sous-dossiers: sudo chmod -R 775 /var/www/.
+3. Pour que tu puisses aussi écrire dans ce dossier (en tant que "user"), le plus simple est d'ajouter ton propre utilisateur dans le groupe www-data (auquel appartient aussi l'utilisateur www-data). sudo usermod -a -G www-data YOURUSERNAME
+4. Déconnecte-toi, puis reconnecte-toi pour qu'Ubuntu tienne compte des changements.
+
+### Créer sa première base de données MySQL
+
+1. mysql -u root -p
+2. Il te demande le mot de passe de l'utilisateur root. Indique "user" (ou autre, selon ce que tu as spécifié ci-dessus).
+3. A partir de ce moment, le prompteur s'attend à recevoir des instructions selon la syntaxe SQL.
+Créons une base de données que l'on baptise: "test": create database test;
+
+À ce stade, tu as une base de données "test" vide. Utilise un outil tel que HeidiSQL, PhpMyAdmin ou MySQL Workbench pour te faciliter la création des tables nécessaires.
+
+**Source**
+
+jackreichert.com
+
+### Créer une base de données
+
+Une base de données (DB) est désigne essentiellement un ensemble de tables. Donc pour créer une table:
+
+````MySQL
+CREATE DATABASE nom_de_la_db;
+````
+Typiquement, le nom choisi correspond au nom de l'application motivaant la création de cette de.
+
+### Créer des tables
+
+Créer une table consiste à lui choisir un nom (par convention, toujours au pluriels puisque une table est destinée à contenir plusieurs éléments. Ensuite , il faut définir les colonnes décrivat chaque caractéristique utile de l'objet. C'est une partie un peu laborieuse: Il faut spécifier un nom et le type de données que va conteneir la colonne.
+
+Les types principaux sont: 
+
+* VARCHAR(255) : pour les textes courts (de 255 caractères ou moins). Exemple: adresse mail
+**Note :** Si tu es certain(e) que toutes les valeurs à stocker auront exactement le même nombrede caractères, alors utilise plutôt CHAR(x) (x étant le nombre de caractères)
+* INT: pour les valeurs numériques (chiffres). Par exemple, un age, une pointure de chaussure
+* TEXT : pour des textes longs (pour une biographique par exemple, Booléen, Chiffre ("Integer') , etc. 
+* DATE: pour stocker des dates.
+
+````MySQL
+CREATE TABLE octocats
+    (`promo` varchar(17), `firstname` varchar(15), `lastname` varchar(19), `gender` varchar(1), `birthdate` varchar(10), `age` int, `mail` varchar(29), `github` varchar(15))
+;
+````
+
+Pour débuter, le mieux est d'installer sur ton serveur web un outil comme PhpMyAdmin. Il va te permettre de manipuler visuellement tes bases de données, tout en affichant à chaque fois la requête SQL générée. C'et une bonne manière d'apprendre.
+
+## SQL + PHP = la classe PDO
 
 
 
