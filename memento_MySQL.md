@@ -610,7 +610,7 @@ Ce code crée une table appelée Météo (contenant une série de villes, tempé
 
 ### Exercice
 
-1. Crée un dossier dans lequel héberger cet exercice, par exemple: "php-pdo" quelque part dans le dossier servi par localhost. (sans doute /var/www/html
+1. Crée un dossier dans lequel héberger cet exercice, par exemple: "php-pdo" quelque part dans le dossier servi par localhost. (sans doute /var/www/html)
 
 2. À l'intérieur, crée un fichier index.php
 
