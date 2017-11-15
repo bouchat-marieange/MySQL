@@ -270,6 +270,8 @@ WHERE nom_de_colonne OPERATEUR "valeur"
 
 Réalise le quizz SQL de la W3School pour vérifier tes connaissances fraîchement acquises
 
+** Voir quizz MySQL - résultat 23/25
+
 Si le quizz se passe bien pas à l'étape d'installation de LAMP sur ta machine en suivant cette procédure:
 
 ## Installer MySQL sur ta machine
@@ -337,7 +339,7 @@ phpinfo();
 1. mysql -u root -p
 2. Il te demande le mot de passe de l'utilisateur root. Indique "user" (ou autre, selon ce que tu as spécifié ci-dessus).
 3. A partir de ce moment, le prompteur s'attend à recevoir des instructions selon la syntaxe SQL.
-Créons une base de données que l'on baptise: "test": create database test;
+Créons une base de données que l'on baptise: "test": 
 
 À ce stade, tu as une base de données "test" vide. Utilise un outil tel que HeidiSQL, PhpMyAdmin ou MySQL Workbench pour te faciliter la création des tables nécessaires.
 
@@ -376,7 +378,252 @@ Pour débuter, le mieux est d'installer sur ton serveur web un outil comme PhpMy
 
 ## SQL + PHP = la classe PDO
 
+Effectue ce petit exercice (il y a un tuto pour t'aider).
 
+### Se connecter à une base de données avec PDO
+
+**Pré-requis**
+
+* Connaître les manipulations de base d'une BD
+	* SELECT FROM
+	* WHERE
+	* HAVING
+	* ORDER BY
+* Avoir créé sa première base de données
+	Suivre ce lien pour créer sa BD (déja effectuer plus haut:  taper dans la console: mysql -u root -p, puis le mot de passe de l'utilisateur root et introduire la commande create database test; (une nouvelle DB test vide vient d'être créer, on peut la voir dans phpmyAdmin)
+* Être familiarisé à PHPMyAdmin
+
+#### PDO : la théorie
+
+PDO est une méthode d'accès aux bases de données: **P**HP **D**ata **O**bjects
+PDO est activé apr défaut lorsque l'on installe php5.6 ou ultérieur.
+
+Pour vérifier, rends-toi sur le fichier info.php précédement créer (à l'adresse http://localhost/info.php) et fais uen rechercher sur PDO (Ctrl + F)
+
+Si il 'est pas activé, vous devez le faire manuellement dans le fichier php.ini et modifier cette ligne:
+````code
+pdo_mysql.default_socket = /opt/lampp/var/mysql/mysql.sock
+````
+
+#### Se connecter à la BD avec PDO
+
+Tu dois créer une nouveau fichier PHP dans un nouveau sous-dossier de var/html et utiliser ce code:
+
+````code
+<?php
+try
+{
+	// On se connecte à MySQL
+	$bBD = new PDO('mysql:host=localhost;dbname=becode;charset=utf8', 'root', 'MOTDEPASSE');
+}
+catch(Exception $e)
+{
+	// En cas d'erreur, on affiche un message et on arrête tout
+        die('Erreur : '.$e->getMessage());
+}
+?>
+````
+
+Pour que cela fonctionne, il te faut ces infos:
+
+* le nom d'hôte (localhost): généralement ceci ne change pas;
+* la base de données (becode) : c'est le nom de la base e données à manipuler qu'il faudra créer préalablement via PHPMyAdmin,
+* le login (root) : ton nom d'utilisateur;
+* le mot de passe: sous WAMP il n'y a pas de mot de passe, sous MAMP le mot de pass est par défaut root mais il se peut que tu l'aie changé lors de la modification des droits d'écriture.
+
+Le TRY et le CATCH servent à vérifier qu'il n'y ait pas d'erreur.
+
+#### Récupérer les données
+
+##### Importer les données
+
+Tu dois importer la table météo via PHPMyAdmin (via l'onglet "import") . Et ajouter dans ton fichier PHP à la suite du code précédent:
+
+Pour importer la table meteo via PHPMyAdmin, il faut d'abord créer dans le dossier un nouveau fichier appelé meteo.sql dans lequel on copie colle, le code suivant:
+
+````code
+      CREATE TABLE meteo
+      (`ville` varchar(9), `haut` int, `bas` int)
+      ;
+
+      INSERT INTO meteo
+        (`ville`, `haut`, `bas`)
+      VALUES
+        ('Bruxelles', 27, 13),
+        ('Liège', 25, 15),
+        ('Namur', 26, 15),
+        ('Charleroi', 25, 12),
+        ('Bruges', 28, 16)
+      ;
+````
+
+Puis on va dans PHPMyAdmin , on vérifie que l'on est bien positionner sur la DB becode et on va sur l'onglet importer, on selectionne le fichier meteo.sql et on laisse les options par défaut et on clique sur le bouton exécuter. Une nouvelle table meteo est créer dans la DB becode.
+
+On peut également copier, coller directement le code de la table météo dans l'onglet MySQL de PHPMyAdmin puis cliquer sur le bouton exécuter, le résultat sera le même, une nouvelle table météo sera créée dans la db becode
+
+````code
+$resultat = $BD->query('SELECT * FROM meteo');
+````
+
+Le contenu des parenthèses est à modifier selon les opérations/manipulations que tu veux faire sur la BD. Le contenu de la BD est stocké sous forme d'objet dans la variable $resultat.
+
+##### Afficher les données de la BD
+
+On doit faire un fetch() sur la variable déclarée $resultat ($donnees donnera un ARRAY):
+
+````code
+$donnees = $resultat->fetch();
+````
+
+Ensuite il suffit de faire un echo sur la variable que tu as déclaré, ici c'est $donnees et la mettre dans une boucle: 
+
+````code
+while ($donnees = $resultat->fetch())
+{
+  echo $donnees['nom_de_la_colonne'];
+}
+````
+
+où ['nom_de_la_colonne'] est facultatif et te permet de récupérer le contenu d'une colonne particulière. 
+
+Enfin, il faudra ajouter cette dernière ligne pour **terminer le traitement** de la requête:
+
+````code
+$resultat->closeCursor();
+````
+
+Plus d'infos sur [PHP.net](http://php.net/manual/fr/book.pdo.php)
+
+Résumé:
+
+1. On a donc créer une table becode avec PHPMyAdmin que on a appelé becode
+2. On a créer un nouveau dossier dans html (dossier serveur local) et créer à l'intérieur un fichier meteo.sql contenant le code suivant:
+
+````code
+      CREATE TABLE meteo
+      (`ville` varchar(9), `haut` int, `bas` int)
+      ;
+
+      INSERT INTO meteo
+        (`ville`, `haut`, `bas`)
+      VALUES
+        ('Bruxelles', 27, 13),
+        ('Liège', 25, 15),
+        ('Namur', 26, 15),
+        ('Charleroi', 25, 12),
+        ('Bruges', 28, 16)
+      ;
+````
+4. On à importer dans PHPMyAdmin le fichier meteo.sql en vérifiant que l'on est bien positionner sur la base de données becode (dans la colonne de gauche)
+3. On a créer dans le même dossier un fichier test.php qui contient le code suivant :
+
+````php
+<?php
+try
+{
+	// On se connecte à MySQL
+	$BD = new PDO('mysql:host=localhost;dbname=becode;charset=utf8', 'root', 'user');
+}
+catch(Exception $e)
+{
+	// En cas d'erreur, on affiche un message et on arrête tout
+        die('Erreur : '.$e->getMessage());
+}
+
+// On stocke dans une variable $resultat la totalité du tableau (toutes ses cellules) (*) de la table (array) meteo
+$resultat = $BD->query('SELECT * FROM meteo');
+
+// Grâce à la fonction fetch() on récupère et on stocke dans une variable $donnees, toutes les données du tableau météo pour pouvoir les traiter
+$donnees = $resultat->fetch();
+
+// On effectue ensuite une boucle while les données stockées dans la variable $données pour les afficher. On utilise la concaténation pour afficher de manière plus élégantes les informations
+while ($donnees = $resultat->fetch())
+{
+  echo $donnees['ville']. ' : '. $donnees['haut']. ' - ' . $donnees['bas'];
+	echo "<br/>";
+}
+
+// A l'affichage la boucle précédente affichera dans http://localhost/test/test.php, le résultat suivant:
+// Liège : 25 - 15
+// Namur : 26 - 15
+// Charleroi : 25 - 12
+// Bruges : 28 - 16
+
+// On ajoute une dernière ligne de code avec la fonction closeCursor() qui permet de terminer le traitement de la requête
+$resultat->closeCursor();
+?>
+````
+
+Tout fonctionne? 
+Passe à l'étape suivante:
+
+## Exercice PHP / MySQL
+
+Le but de cette série d'exercice est de maitriser la librairie php "PDO" (PHP Data Objects) pour manipuler des bases de données via PHP.
+
+
+### Pré-requis
+
+* LAMP installé et fonctionnel
+* PHPMyAdmin installé et fonctionnel
+
+### Préparation
+
+On va créer une application "weather-app" qui doit simplement afficher les températures du jour (minima et maxima) pour des villes belges.
+
+1. Dans PHPMyAdmin (http://localhost/phpmyadmin/), crée une base de données:
+
+Pour cela aller dans PHPMyAdmin, cliquer sur la petite maison dans la colonne de gauche (juste sous le titre phpMyAdmin. Cela permet d'être certain que l'on est bien à la racine de localhost et pas dans une base de donnée existante.
+
+2. Aller dans l'onglet SQL dans la colonne de droite (en haut est afficher "Exécuter une ou des requêtes SQL sur le serveur "localhost":" (cela vérifie que l'on est bien à la racine et pas dans une base de données éxistantes.
+
+On va taper dans le champ, le code suivant:
+
+````sql
+CREATE DATABASE weatherapp;
+````
+puis cliquer sur le bouton "Exécuter". On constate qu'une nouvelle base de données a été ajoutée dans la colonne de droite et qui porte le nom de weatherapp. Pour l'instant cette nouvelle DB est vide, on va lui ajouter une table.
+
+3. Cliquer sur weatherapp dans la colonne de gauche pour ajouter une nouvelle table dans cette DB. Aller dans l'onglet SQL dans la colonne de droite. En haut il devrait être indiqué "Exécuter une ou des requêtes SQL sur la base weatherapp: "Créer dans la DB weatherapp une nouvelle table appellée Météo en tapant le code suivant dans l'ongle SQL
+
+````code
+CREATE TABLE Météo
+    (`ville` varchar(9), `haut` int, `bas` int);  
+````
+
+3. Taper ensuite le code suivant puis cliquer sur "Exécuter" pour ajouter des données dans la tables
+
+````code
+
+INSERT INTO Météo
+    (`ville`, `haut`, `bas`)
+VALUES
+    ('Bruxelles', 27, 13),
+    ('Liège', 25, 15),
+    ('Namur', 26, 15),
+    ('Charleroi', 25, 12),
+    ('Bruges', 28, 16)
+;
+````
+
+Ce code crée une table appelée Météo (contenant une série de villes, températures maxima et minima) qui sera ajoutée dans la DB weatherapp.
+
+### Exercice
+
+1. Crée un dossier dans lequel héberger cet exercice, par exemple: "php-pdo" quelque part dans le dossier servi par localhost. (sans doute /var/www/html
+
+2. À l'intérieur, crée un fichier index.php
+
+3. Modifie ce fichier php et crée un script qui:
+
+* se connecte à la base de données weatherapp
+* lit le contenu de la table Météo
+* affiche un tableau html avec une rangée par rangée du tableau retourné
+* Ajoute un formulaire avec 3 champs (ville, haut, bas) permettant d'ajouter d'autres villes
+
+4. Fais en sorte que lorsque le formulaire est envoyé, son contenu soit ajouté à la table "Météo".
+
+5. Fait? Ajoute à présent le code html nécessaire pour ajouter une checkbox à chaque ville, et fais en sorte, en php, que lorsqu'on clique dessus, cela efface la ville en question de la table "Météo".
 
 
 
