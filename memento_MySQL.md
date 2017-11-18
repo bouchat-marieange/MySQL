@@ -1059,6 +1059,155 @@ SELECT nom, possesseur, console, prix FROM jeux_video WHERE console='Xbox' OR co
 
 Cette requête affichera le nom du jeux, son possesseur, le type de console, et le prix de la table jeux_video uniquement pour le type de console Xbox ou PS2 en les classant par ordre de prix décroissant (du plus cher au moins cher) et n'affichera que les 10 premiers résultats.
 
+
+**Construire des requêtes en fonction de variables**
+
+Il faut éviter de concaténer une variable dans une requête. Ici on affiche les jeux appartenant à Patrick. 
+
+Note: Il est nécessaire d'entourer la chaîne de caractères d'apostrophes comme indiqué d'où la présence d'antislashs pour insérer les apostrophe \'
+
+````php
+<?php
+$reponse = $bdd->query('SELECT nom FROM jeux_video WHERE possesseur=\'Patrick\'');
+?>
+````
+ 
+Si on veut par exemple afficher les jeux appartenant à un possesseur récupérer en GET, il faut éviter de faire ceci:
+
+````php
+<?php
+$reponse = $bdd->query('SELECT nom FROM jeux_video WHERE possesseur=\'' . $_GET['possesseur'] . '\'');
+?>
+````
+
+Ce code fonctionne mais est la parfaite représentation de ce qu'il ne faut pas faire. Pourquoi?
+Parce que si la variable $_GET['possesseur'] a été modifie par un visiteur (qui peut être mal intentionné) il y a un gros risque de faille de sécurité appellée injection SQL. Ainsi un visiteur pourrait s'amuser à insérer une requête SQL au milieur de la vôtre et potentiellement lire tout le contenu de votre base de données, comme par exemple la liste des motes de passe de vos utilisateurs.
+
+Pour éviter ce problème, nous allons utiliser un moyen plus sûr d'adapter nos requêtes en fonctions de variables: Les requêtes préparées
+
+**Les requêtes préparées**
+
+Les requêtes préparées sont plsu sûr mais aussi plus rapides pour la base de données si la requête est exécutée plusieurs fois. C'est ce qui est préconiser si on veut adapter une requête en fonction d'une ou plusieurs variables (récupérée via un formulaire en get ou en post par exemple)
+
+D'abord on prépare la requête sans sa partie variable qui sera représenté par un ?
+
+````php
+<?php
+$req = $bdd->prepare('SELECT nom FROM jeux_video WHERE possesseur = ?');
+?>
+````
+
+Cette fois, on n'exécute pas la requête avec query() mais on appelle prepare(). La requête est alors prête sans sa partie variable. il faut encore l'exécuter en appelant execute et lui transmettre la liste des paramètres.
+
+
+````php
+<?php
+$req = $bdd->prepare('SELECT nom FROM jeux_video WHERE possesseur = ?');
+$req->execute(array($_GET['possesseur']));
+?>
+````
+
+la requête est alors exécutée à l'aide des paramètres que l'on a indiqués sous forme d'array. 
+
+Si il y a plusieurs marqueurs, il faut indiquer les paramètres dans le bon ordre: 
+
+````php
+<?php
+$req = $bdd->prepare('SELECT nom FROM jeux_video WHERE possesseur = ? AND prix <= ?');
+$req->execute(array($_GET['possesseur'], $_GET['prix_max']));
+?>
+````
+
+Le premier point d'interrogation de la requête sera remplacé par le contenue de la variable $_GET['possesseur'], et le seconde par le contenu de ]_GET['prix_max']. Le contenu de ces variables aura été automatiquement sécurisé pour prévenir les risques d'injections SQL.
+
+Voici le code complet capable de lister les jeux appartenant à une personnes et dont le prix ne dépasse pas une certaine somme: 
+
+````php
+<?php
+try
+{
+	$bdd = new PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', '');
+}
+catch(Exception $e)
+{
+        die('Erreur : '.$e->getMessage());
+}
+
+$req = $bdd->prepare('SELECT nom, prix FROM jeux_video WHERE possesseur = ?  AND prix <= ? ORDER BY prix');
+$req->execute(array($_GET['possesseur'], $_GET['prix_max']));
+
+echo '<ul>';
+while ($donnees = $req->fetch())
+{
+	echo '<li>' . $donnees['nom'] . ' (' . $donnees['prix'] . ' EUR)</li>';
+}
+echo '</ul>';
+
+$req->closeCursor();
+
+?>
+````
+
+Attention: Bien que la requête soit "sécurisée" (élimination des risques d'injection SQL), il faudra quand même vérifier que $_GET['prix_max'] contient bien un nombre et qu'il est compris dans un intervalle correct. Il faut donc effectuer des vérifications supplémentaires si cela est nécessaire.
+
+
+**Une page dont le contenu change en fonction des paramètres reçus**
+
+Si la requête contient beaucoup de parties variables, il peut être plus pratique de nommer les marqueurs plutôt que d'utiliser des points d'interrogation.
+
+````php
+<?php
+$req = $bdd->prepare('SELECT nom, prix FROM jeux_video WHERE possesseur = :possesseur AND prix <= :prixmax');
+$req->execute(array('possesseur' => $_GET['possesseur'], 'prixmax' => $_GET['prix_max']));
+?>
+````
+
+Les points d'interrogation ont étéremplacés par les marqueurs nominatifs :possesseur et :prixmax (ils doivent commencer parle symbole deux-points).
+
+Cette fois-ci,ces marqueurs sont remplacés par les variables à l'aide d'un array associatif. Quand il y a beaucoup de paramètres, cela permet parfois d'avoir plus de clarté. De plus contrairement aux points d'interrogation, nous ne sommes cette fois plus obligés d'envoyér les variables dans le même ordre que la requête.
+
+
+**Traquer les erreurs**
+
+Lorsqu'une requête SQL plante, souvent PHP vous dira qu'il y a une erreur à la ligne fetch
+
+Exemple: Fatal error: Call to a member function fetch() on a non-object in C:\wamp\www\tests\index.php on line 13
+
+Ce n'est pas très précis et de plus ce n'est pas la ligne fetch qui est en cause, mais une erreur dans l'écriture de la requête SQL quelques lignes plus haut. 
+
+Pour afficher des détails sur l'erreur, il faut activer les erreurs lors de la connexion à la la base de données via PDO. Il suffit pour cela d'ajouter un petit morceau de code à la ligne de connexion à la DB, comme ceci:
+
+````php
+<?php
+$bdd = new PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', '', array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+?>
+````
+
+Désormais, toutes vos requêtes SQL qui comportent des errreurs les afficheront avec une message beaucoup plus clair et précis.
+
+Imaginons pas exemple que j'écrive mal le nom du champ
+
+````php
+<?php
+$reponse = $bdd->query('SELECT champinconnu FROM jeux_video');
+?>
+````
+
+L'erreur suivant s'affichera:
+
+Unknown column 'champinconnu' in 'field list'
+
+Cela indique clairement que la colonne champinconnuest introuvable dans la liste des champs. En effet, il n'y a aucun champ qui s'appelle champinconnu.
+
+## En résumé
+
+* Pour dialoguer avec MySQL depuis PHP, on fait appel à l'extension PDO de PHP.
+* Avant de dialoguer avec MySQL, il faut s'y connecter. On a besoin de l'adresse IP de la machine où se trouve MySQL, du nom de la base de données ainsi que d'un login et d'un mot de passe.
+* Les requêtes SQL commençant parSELECT permettent de récupérer des informations dans une base de données.
+* Il faut faire une boucle en PHP pour récupérer ligne par ligne les données renvoyées par MySQL.
+* Le langage SQL propose de nombreux outils pour préciser nos requêtes, à l'aide notamment des mots-clésWHERE(filtre),ORDER BY(tri) etLIMIT(limitation du nombre de résultats).
+* Pour construire une requête en fonction de la valeur d'une variable, on passe par un système de requête préparée qui permet d'éviter les dangereuses failles d'injection SQL.
+
 ### Exercice
 
 1. Crée un dossier dans lequel héberger cet exercice, par exemple: "php-pdo" quelque part dans le dossier servi par localhost. (sans doute /var/www/html)
