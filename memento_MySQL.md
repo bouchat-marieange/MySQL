@@ -680,6 +680,384 @@ var_dump(isset($a['cake']['a']['b']));  // FALSE
 ````
 
 
+### Théorie PHP - MySQL  - OpenClassrooms
+
+**Se connecter à la base de données**
+
+PHP est l'intermédiaire entre vous et MySQL. Cependant PHP ne peut pas envoyé directment des instructions à MySQL du type "Récupère-moi ces valeurs" sans fournir au préalable un nom d'utilisateur et mot de passe (sinon tout le monde pourrait accéder à la DB et lire les infos parfois confidentielles qu'elle contient)
+
+Pour établir la connexion entre PHP et la DB il faut donc que PHP s'authentifie, on pourra ensuite réaliser des opérations sur la DB.
+
+On utilise l'extension PDO (PHP Data Objects) pour établir cette connexion. Il s'agit d'un outil complet qui permet d'accéder à n'importe quelle base de données (MySQL, PostgreSQL, Oracle).
+
+4 Renseignements sont nécessaires pour se connecter à la db avec PDO:
+
+1. Le nom de l'hôte où MySQL est installé (localhost ou autre valeur renseignée par votre hébergeur type sql.hebergeur.com lorsque le site est en ligne)
+2. Le nom de la base de données à laquelle on veut se connecter (ex: test). Nous l'avons créer avec PHPmyAdmin préalablement
+3. Le login en local le plus souvent root ou si site en ligne login utiliser pour FTP
+4. Le mot de passe , en local root ou autre (user) ou mot de passe utiliser pour FTP si site en ligne.Si pas de mot de passe laisser l'espace vide entouré de ''.
+
+Voici le code pour se connecter à la DB avec PDO
+
+````php
+<?php
+$bdd = new PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', 'user');
+?>
+````
+
+Cette ligne de code crée un objet $bdd, ce n'est pas une variable mais un objet qui représente la connexion avec la base de données.
+
+Note: N'oubliez pas de changer votre login et mot de passe lorsque vous passerez du développement en local (localhost) à la mise en ligne de votre site sur internet avec login et mot de passe fournir par votre hébergeur.
+Le premier paramètre (qui commence parmysql) s'appelle le DSN : Data Source Name. C'est généralement le seul qui change en fonction du type de base de données auquel on se connecte.
+
+Test: Si la connexion s'est bien passé en allant sur la page localhost/ de votre projet,rien ne devrait s'afficher à l'écran. Si un message d'erreur s'affiche c'est qu'il y a une erreur dans les informations ou la syntaxe des informations fournies.
+
+**Tester la présence d'erreurs**
+
+Test: Si la connexion s'est bien passé en allant sur la page localhost/ de votre projet,rien ne devrait s'afficher à l'écran. Si un message d'erreur s'affiche c'est qu'il y a une erreur dans les informations ou la syntaxe des informations fournies. Hors PHP risque d'afficher toute la ligne qui pose erreur, ce qui inclust le mot de passe! Pour éviter que vos visiteurs puissent voir le mot de passe si une erreur survient, on écrit un code pour traiter cette éventuelle erreur. En cas d'erreur PDO renvoie ce qu'on appelle une exception qui permet de "capturer" l'erreur. Voici le code à  indiqué pour traiter l'erreur.
+
+````php
+<?php
+try 
+{
+	$bdd = new PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', '');
+}
+catch (Exception $e)
+{
+        die('Erreur : ' . $e->getMessage());
+}
+?>
+````
+
+PHP essaie d'exécuter les instructions à l'intérieur du bloc try (connexion à la DB). Si il y a une erreur, il rentre dans le bloc catch et fait ce qu'on lui demande (ici: on arrête l'exécution de l apage en affichant un message décrivant l'erreur).
+
+Si au contraire tout se passe bien, PHP poursuit l'exécution du code et ne lit pas ce qu'il y a dans le bloc catch. La page PHP ne devrait donc rien afficher pour le moment.
+
+**Récupérer les données**
+
+On peut soit créer une base de données directement dans PHPMyAdmin, ou importer une base de données déja toute faite au format .sql via PHPMyAdmin grâce à l'onglet importer en se positionnant préalablement sur la DB que l'on aura créer pour acceuillir la nouvelle table.
+
+Ici on a créer une nouvelle base de données appellée Tuto_OpenClassrooms et nous avons impor$reponse = $bdd->query('Tapez votre requête SQL ici');ter le fichier fournis sur le site à l'adresse :https://static.oc-static.com/prod/courses/files/concevez-votre-site-web-avec-php-et-mysql/jeux_video.zip (dezipper le fichier puis importer avec les options par défaut dans l'onglet impoter de phpmyadmin en veillant à selectionner la bonne base de données auparavant). Voilà la table est importée. Nous allons maintenant en afficher le contenu.
+
+**Récupéré le contenu d'une table contenue dans une DB**
+
+Pour afficher une table, il faut faire une requête (query) en language MySQL pour demander à MySQL d'afficher ce que contient la table.
+
+Pour cela nous avons besoin tout d'abord de notre objet représentant la connexion à la base de données ($bdd) que nous avons définit auparavant. 
+
+````SQL
+$reponse = $bdd->query('Tapez votre requête SQL ici');
+````
+
+On récupère avec la requête MySQL ce que la base de données va nous renvoyé dans une autre objet appelé ici $reponse.
+
+````MySQL
+SELECT * FROM jeux_video
+````
+
+* Select indique le type d'opération,select demande à MySQL d'afficher le contenu de la table
+* "l'étoile" indique à MySQL d'afficher la totalité de la table (toutes les colonnes), on peut également indiqué des noms de certaines colonnes si on ne veut pas afficher toutes la table
+* FROM signifie "dans" et fait la liaison entre le nom des champs et le nom de la table (ici: jeux_video)
+* jeux_video: c'est le nom de la table dans laquelle il faut aller piocher.
+
+Voici donc le code complet de la requête :
+
+````php
+<?php
+$reponse = $bdd->query('SELECT * FROM jeux_video');
+?>
+````
+
+
+**Afficher le contenu complet d'une table contenue dans une DB**
+
+Voilà, maintenant réponse contient la réponse de MySQL et donc la totalité du contenu de la table jeux_video. Le problème c'est que $reponse contient quelque chose d'inseploitage. MySQL renvoie beaucoup d'informations qu'il faut organiser. Imaginer une table de 10 champs avec 200 entrées représente plus de 2000 informations. Pour ne pas tout traiter d'un coup, on extrait cette réponse ligne apr ligne, c'est à dire entrée par entrée.
+
+Pour récupérer une entrée, on prend la réponse de MySQL et on y exécute fetch(), ce qui nous renvoie la première ligne. fetch en anglais veut dire "va chercher".
+
+````php
+<?php
+$donnees = $reponse->fetch();
+?>
+````
+
+$donnees est un array qui contient champ par champ les valeur de la premiere entrée.
+Par exemple, si on s'intéresse au champ console, on utilisera l'array $donnees['console']
+
+Il faut faire une boucle pour parcourir les entrées une par une. Chaque fois que l'on appelle $reponse->fetch(); on passe à l'entrée suivante. La boucle est donc répétée autaut de fois qu'il y a d'entrée dans la table.
+
+
+**Code complet d'affichage du contenu de toute la table contenue dans la DB et résultat**
+
+````php
+<?php
+try
+{
+	// On se connecte à MySQL
+	$bdd = new PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', '');
+}
+catch(Exception $e)
+{
+	// En cas d'erreur, on affiche un message et on arrête tout
+        die('Erreur : '.$e->getMessage());
+}
+
+// Si tout va bien, on peut continuer
+
+// On récupère tout le contenu de la table jeux_video
+$reponse = $bdd->query('SELECT * FROM jeux_video');
+
+// On affiche chaque entrée une à une
+while ($donnees = $reponse->fetch())
+{
+?>
+    <p>
+    <strong>Jeu</strong> : <?php echo $donnees['nom']; ?><br />
+    Le possesseur de ce jeu est : <?php echo $donnees['possesseur']; ?>, et il le vend à <?php echo $donnees['prix']; ?> euros !<br />
+    Ce jeu fonctionne sur <?php echo $donnees['console']; ?> et on peut y jouer à <?php echo $donnees['nbre_joueurs_max']; ?> au maximum<br />
+    <?php echo $donnees['possesseur']; ?> a laissé ces commentaires sur <?php echo $donnees['nom']; ?> : <em><?php echo $donnees['commentaires']; ?></em>
+   </p>
+<?php
+}
+
+$reponse->closeCursor(); // Termine le traitement de la requête
+
+?>
+````
+
+Affichera ceci:
+
+![résultat affichage](https://sdz-upload.s3.amazonaws.com/prod/upload/0163.png)
+
+
+
+**Différence entre $reponse et $données**
+
+**$reponse** contient toute la réponse de MYSQL en frac sous forme d'objet, mais pas encore exploitable directement
+
+**$donnees** est un array renvoyé par le fetch(). Chaque fois qu'on fait une boucle, fetch va chercher dans $reponse l'entrée suivant et organise les champs dans l'array $donnees.
+
+
+**Explication de la ligne while ($donnees = $reponse->fetch())**
+
+La ligne while ($donnees = $reponse->fetch()) fait deux choses à la fois: 
+
+* Elle récupère uen nouvelle entrée et place son contenu dans $donnees
+* Elle vérifie si $donnees vaut vrai ou faux.
+
+Le fetch renvoie faux (false) dans $donnees lorsqu'il est arrivé à la fin des données, c'est à dire que toutes les entrées ont été passées en revue. Dans ce cas, la condition while vaut faux et la boucle s'arrête. 
+
+Attention:
+
+A la fin de la ligne on note la présence de ce code:
+
+````php
+<?php $reponse->closeCursor(); ?>
+````
+
+Ce code doit être appelé à chaque fois que l'on a fini de traiter le retour d'une requête pour éviter d'avoir des problèmes à la requête suivante. Elle provoque la "fermeture du curseur d'analyse de résultats". Cela veut dire que l'on a terminé le travail sur la requête.
+
+
+**Afficher seulement le contenu de quelques champs**
+
+On n'est pas obliger d'afficher tout les champs, si on veut juste lister le nom des jeux on utilise la requête suivante:
+
+````MySQL
+SELECT nom FROM jeux_video
+````
+
+Et donc le code complet sera:
+
+````php
+<?php
+try
+{
+    $bdd = new PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', '');
+}
+catch(Exception $e)
+{
+        die('Erreur : '.$e->getMessage());
+}
+
+$reponse = $bdd->query('SELECT nom FROM jeux_video');
+
+while ($donnees = $reponse->fetch())
+{
+    echo $donnees['nom'] . '<br />';
+}
+
+$reponse->closeCursor();
+
+?>
+````
+
+Cela affichera uniquement la liste des noms de tous les jeux contenu dasns la table jeux_video.
+
+
+**Important - A retenir**
+
+* La connexion à la base de données n'a besoin d'être faite qu'une seule fois, au début de la page.
+* Il faut fermer les résultats de recherche avec closeCursor() après avoir traité chaque requête.
+
+
+
+**Les critères de sélection**
+
+On peut également filtrer les résultats qui seront affiché grâce aux mots clés:
+
+* WHERE
+* ORDER BY
+* LIMIT
+
+WHERE: permet de trier les données. Par exemple: SELECT * FROM jeux_video WHERE possesseur='Patrick'
+Cela signifie "Selectionner tous les champs de la table jeux_video lorsuque le champ possesseur est égal à Patrick". Il faut délimiter les chaînes de caractères entre apostrophes(ex: 'Patrick') mais pas nécessaire pour les nombres. (ex: 5)
+
+
+````php
+<?php
+try
+{
+	$bdd = new PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', '');
+}
+catch(Exception $e)
+{
+        die('Erreur : '.$e->getMessage());
+}
+
+$reponse = $bdd->query('SELECT nom, possesseur FROM jeux_video WHERE possesseur=\'Patrick\'');
+
+while ($donnees = $reponse->fetch())
+{
+	echo $donnees['nom'] . ' appartient à ' . $donnees['possesseur'] . '<br />';
+}
+
+$reponse->closeCursor();
+
+?>
+````
+
+Affichera ceci:
+
+Sonic appartient à Patrick
+Dead or Alive appartient à Patrick
+Dead or Alive Xtreme Beack Volley Ball appartient à Patrick
+....
+
+Il est également paossible de combinner plusieurs conditions. Par exemple si on veut lister les jeux de Patrick qui'il vend à moins de 20€. On combine alors les critères de selection à l'aide du mot-clé AND (et) ou OR (ou)
+
+````php
+SELECT * FROM jeux_video WHERE possesseur='Patrick' AND prix < 20
+````
+
+**Order By**
+
+ORDER BY permet d'ordonner les résultats par ordre ascendant **ASC** (du plus petit au plus grand ou A à Z) ou descendant **DESC** (du plus grand au plus petit ou de Z à A)
+
+
+````php
+SELECT * FROM jeux_video WHERE possesseur='Patrick' AND prix < 20
+````
+Ce qui signifie : « Sélectionner tous les champs de jeux_video et ordonner les résultats par prix croissants ».
+
+Code complet:
+
+````php
+<?php
+try
+{
+	$bdd = new PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', '');
+}
+catch(Exception $e)
+{
+        die('Erreur : '.$e->getMessage());
+}
+
+$reponse = $bdd->query('SELECT nom, prix FROM jeux_video ORDER BY prix');
+
+while ($donnees = $reponse->fetch())
+{
+	echo $donnees['nom'] . ' coûte ' . $donnees['prix'] . ' EUR<br />';
+}
+
+$reponse->closeCursor();
+
+?>
+````
+
+Affichera ceci:
+
+Sonic coûte 2.0 EUR
+The Rocketeer coûte 2.0 EUR
+Super Mario Bros coûte 4.0 EUR
+...
+
+POur classer par ordre décroissant on utilisera le code: 
+
+````php
+SELECT * FROM jeux_video ORDER BY prix DESC
+````
+
+Ce qui signifie: « Sélectionner tous les champs de jeux_video, et ordonner les résultats par prix décroissants »
+
+Si on avait utiliser ORDER BY sur le champ contenant du texte, le classement aurait été fait par ordre alphabétique.
+
+**LIMIT**
+
+LIMIT permet de ne selectionner qu'une partie des résultat (par exemple les 20 premiers), c'est très utiles lorsque l'on a beaucoup de résultat et que l'on souhaite les paginez (ex: afficher les 30 premier résultats sur la page 1, les 30 suivants sur la page 2,...)
+
+A la fin de la requête, il faut ajouter le mot-clé LIMIT suivi de deux nombres séparés par une virgule.
+
+````php
+SELECT * FROM jeux_video LIMIT 0, 20
+````
+
+Ces deux nombres ont un sens bien précis:
+
+* Le premier chiffre indique à partir de quelle entrée on commence à lire la table. Si on met "0" cela correspond à la première entrée. Exemple: Pour une requête qui renvoie 100 resultats, LIMIT tronquera à partir du premier resultat sui on indique 0, à partir du 21e resultat si on indique 20, etc..
+* Le 2e nombre indique combien d'entrée doivent être seletionnée. 
+Par exemple:
+
+* LIMIT 0, 20 : affiche les vingt premières entrées ;
+* LIMIT 5, 10 : affiche de la sixième à la quinzième entrée ;
+* LIMIT 10, 2 : affiche la onzième et la douzième entrée.
+
+Voici le code complet pour afficher les noms des 10 premiers jeux de la tables : 
+
+````php
+<?php
+try
+{
+    $bdd = new PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', '');
+}
+catch(Exception $e)
+{
+        die('Erreur : '.$e->getMessage());
+}
+
+$reponse = $bdd->query('SELECT nom FROM jeux_video LIMIT 0, 10');
+
+echo '<p>Voici les 10 premières entrées de la table jeux_video :</p>';
+while ($donnees = $reponse->fetch())
+{
+    echo $donnees['nom'] . '<br />';
+}
+
+$reponse->closeCursor();
+
+?>
+````
+
+**Toutes les requêtes SQL cumulées**
+
+Attention lorsque l'on cumule différentes requêtes SQL, il faut respecter les mots clefs dans l'ordre suivant: WHERE, ORDER BY puis LIMIT
+
+Exemple:
+
+````php
+SELECT nom, possesseur, console, prix FROM jeux_video WHERE console='Xbox' OR console='PS2' ORDER BY prix DESC LIMIT 0,10
+````
+
+Cette requête affichera le nom du jeux, son possesseur, le type de console, et le prix de la table jeux_video uniquement pour le type de console Xbox ou PS2 en les classant par ordre de prix décroissant (du plus cher au moins cher) et n'affichera que les 10 premiers résultats.
 
 ### Exercice
 
