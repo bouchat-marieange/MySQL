@@ -380,6 +380,14 @@ Pour débuter, le mieux est d'installer sur ton serveur web un outil comme PhpMy
 
 Effectue ce petit exercice (il y a un tuto pour t'aider).
 
+## Tutoriel OpenClassrooms
+
+Source: [Tutoriel OpenClassrooms] (https://openclassrooms.com/courses/concevez-votre-site-web-avec-php-et-mysql/lire-des-donnees-2)
+
+
+
+
+
 ### Se connecter à une base de données avec PDO
 
 **Pré-requis**
@@ -607,6 +615,71 @@ VALUES
 ````
 
 Ce code crée une table appelée Météo (contenant une série de villes, températures maxima et minima) qui sera ajoutée dans la DB weatherapp.
+
+
+#### Tester si un variable existe
+
+Pour tester si un variable existe ou non on utilise la fonction native isset() dans un if...else. On peut également tester avec !isset() qui signifie si la variable n'existe pas.
+La fonction isset() retourne true sur la variable existe et a une valeur autre que NULL et retourne FALSE si la variable n'existe pas ou à une valeur NULL.
+
+````php
+
+<?php
+
+$var = ''; //Dans ce cas la variable existe mais son contenu est vide
+
+// Ceci est vrai, alors le texte est affiché
+if (isset($var)) {
+    echo 'Cette variable existe, donc je peux l\'afficher.'; // la variable existe même si elle ne contient rien pour l'instant
+}
+
+// Dans les exemples suivants, nous utilisons var_dump() pour afficher 
+// le retour de la fonction isset().
+//var_dump()permet est une fonction native de PHP qui permet d'afficher les informations structurées d'une variable.
+//unset() est une fonction native de PHP qui permet de détruire une variable. Après l'avoir utilisé sur une variable, celle-ci n'existe plus.
+
+
+$a = 'test';
+$b = 'anothertest';
+
+var_dump(isset($a));      // TRUE 
+var_dump(isset($a, $b)); // TRUE
+
+unset ($a);
+
+var_dump(isset($a));     // FALSE
+var_dump(isset($a, $b)); // FALSE
+
+$foo = NULL;
+var_dump(isset($foo));   // FALSE
+
+?>
+
+````
+
+Cela fonctionne aussi pour les tableaux
+
+````php
+<?php
+
+$a = array ('test' => 1, 'bonjour' => NULL, 'pie' => array('a' => 'apple'));
+
+var_dump(isset($a['test']));            // TRUE
+var_dump(isset($a['foo']));             // FALSE
+var_dump(isset($a['bonjour']));           // FALSE
+
+// La clé 'bonjour' vaut NULL et est considérée comme non existante
+// Si vous voulez vérifier l'existence de cette clé, utilisez cette fonction
+var_dump(array_key_exists('bonjour', $a) ); // TRUE
+
+// Vérification des valeurs en profondeur
+var_dump(isset($a['pie']['a']));        // TRUE
+var_dump(isset($a['pie']['b']));        // FALSE
+var_dump(isset($a['cake']['a']['b']));  // FALSE
+?>
+````
+
+
 
 ### Exercice
 
