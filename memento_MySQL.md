@@ -1348,8 +1348,114 @@ Voici d'autres exemples de relation 1-to-many
 
 ### Relation many-to_many
 
+Dans une relation "many-to-many", chaque rangée de la table A peut avoir une ou plusieurs relations avec des rangées de la table B. On a dès lors besoin d'une table spécifique stockant les relations.
+
+Par exemple:
+
+Une équipe de vendeurs doit vendre différents produits. On doit pouvoir CRUD les vendeurs (create, read, update, delete), les produits et les ventes. Une vente correspond en fait à stocker l'information comme quoi un vendeur untel à vendu une produit untel.
+
+<p><strong>table: Sellers</strong></p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>Seller Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jacques</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Thomas</td>
+</tr>
+<tr>
+<td>3</td>
+<td>John</td>
+</tr></tbody></table>
+<p><strong>table: Products</strong></p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>Product Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Pommes</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Poires</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Bananes</td>
+</tr></tbody></table>
+<p><strong>table: purchases</strong></p>
+<table>
+<thead>
+<tr>
+<th>product_id</th>
+<th>seller_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>2</td>
+</tr></tbody></table>
 
 
+Cette table est appellée une table de jonction (voir la doc: http://www.databaseprimer.com/pages/relationship_xtox/).
+
+Pour avoir le détail des ventes en SQL, on utilise la syntaxe JOIN:
+
+````sql
+SELECT * FROM purchases 
+LEFT JOIN products ON purchases.product_id=products.id 
+LEFT JOIN sellers ON sellers.id=purchases.seller_id ;
+````
+
+### Relation 1-to-1 (ou relation 1:1)
+
+Très peu utilisée, en général il vaut mieux les fusionner en une seule table.
+Doc: http://www.databaseprimer.com/pages/relationship_1to1/
+
+
+### Exercices dans un outil de modélisation
+
+Pour faire des exercices, il faut d'abord installer un outil visuel de modélisation de bases de données.
+
+**Modèle Conceptuel de Données (MCD)**
+
+Un MCD te permet de concevoir de manière visuelle ta base de données et les relations entre les tables.
+
+MCD
+
+En général, il y a moyen de le connecter à ton serveur local et d'ainsi appliquer les changements de ton modèle à la base de données. Il peut également générer automatiquement le code SQL nécessaire pour la création de ta base de données.
+
+**Logiciel de MCD gratuits**
+
+* MySql Workbench est le standard: gratuit, versatile mais parfois buggy et l'interface est peu intuitive.(https://www.mysql.com/products/workbench/)
+	* pour l'installer: sudo apt-get install mysql-workbench
+	* pour le lancer: mysql-workbench
+* QuickDB permet de concevoir sa DB via un pseudocode simple et visualisé en temps réel.(https://app.quickdatabasediagrams.com/)
+* DBeaver: permet de visualiser (mais pas de modifier) une base de données existante. Nécessite d'installer le JDK (https://dbeaver.jkiss.org/) (http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* ER diagram designer hébergé sur Inside.Becode.org (si jamais les autres outils chient dans la colle sur vos machines)(https://inside.becode.org/tools/sql/)
+* PonyORM (https://ponyorm.com/)
 
 
 
