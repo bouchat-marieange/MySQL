@@ -1226,6 +1226,132 @@ Cela indique clairement que la colonne champinconnuest introuvable dans la liste
 5. Fait? Ajoute à présent le code html nécessaire pour ajouter une checkbox à chaque ville, et fais en sorte, en php, que lorsqu'on clique dessus, cela efface la ville en question de la table "Météo".
 
 
+## Base de données relationnelles
+
+Des tables relationnelles, sont des tables ayant des relations entre elles.
+
+!(tables relationnelles)[https://raw.githubusercontent.com/becodeorg/Lovelace-promo-2/master/Parcours/MySQL/assets/exemple-db-model.png]
+
+### C'est quoi une relation?
+
+En quoi consiste une relation. Grâce à une relation on peut faire des liens par exemple entre un objet et son propriétaire (veste avec étiquette portant le nom de son propriétaire).
+
+Dans une base de données relationnelles, l'étiquette sera une numéro d'identifiant unique (il n'y en a pas 2 qui soient identiques dans une même table, pour éviter toute confusion).
+
+### A quoi ça sert?
+
+Si on doit créer une application pour BECODE qui gérerait les inscriptions et la répartitions des étudiants dans les différentes classes Becode. Cette application répondrait donc à la question :Quel étudiant va dans quelle classe?
+
+Pour cela, l'application afficherait une liste des étudiants par classe, avec leur prénom et leur nom.
+
+Chaque année, il y a de nouvelles classes et de nouveaux étudiants, on va créer une base de données pour gérer ces informations. De quelles tables at-t-on besoin?
+
+
+### Comment faire pour stocker dans tes tables à quelle classe appartient chaque étudiant?
+
+Voici la table stockant les "classes":
+
+<p><strong>Table: Classes</strong></p>
+<table>
+<thead>
+<tr>
+<th>Classe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BXCentral</td>
+</tr>
+<tr>
+<td>Anderlecht</td>
+</tr></tbody></table>
+
+Avec cet identifiant unique (appelé ID), la table devient:
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Classe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>BXCentral</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Anderlecht</td>
+</tr></tbody></table>
+
+Ainsi, si dans une autre table je veux faire référence à la classe "BXCentral", je pointe vers son ID: "1".
+
+Donc, je pourrais stocker l'information permettant d'enregistrer à quelle classe appartient l'étudiant" dans la table "students" en ajoutant une colonne à cette fin, dans laquelle mon application stocke le numéro de l' ID de la classe concernée:
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>classe_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Habib</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Daniela</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Claudy</td>
+<td>2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Adrian</td>
+<td>2</td>
+</tr></tbody></table>
+
+**Remarque:** 
+Pour se faciliter la vie, je nomme la colonne en utilisant le nom de la table associée? ("table" + "_" + "clef primaire" = classe_id. En vérité, tu nommes ta colonne comme tu veux, mais c'est toujours payant de choisir systématiquement des noms simples et explicites).
+
+
+### Comment faire une jointure ?
+
+Sur base de classe_id, on peut maintenant retrouver à quel classe appartient chaque étudiant. En SQL , l'opération consiste à faire une **jointure** (remarque le mot JOIN suivi de la table à joindre à la première suivi de ON suivi d'une équivalence spécifiant quel colonne de la table A doit matcher quelle colonne de la table B. 
+
+````SQL
+SELECT * FROM students 
+LEFT JOIN classes ON classes.id=students.classe_id;
+````
+
+Ce principe de relation est extrêmement puissnat. Il permet de créer des bases de données pour tout ce qu'il est possible d'imaginer de manière rationnelle.
+
+## Les relations
+
+### Relation 1-to-many (ou relation 1:N)
+
+La relation qui relie classes et étudiants dans l'exemple précédent est une relation "1-to-many": chaque classe peut avoir plusieurs étudiants, mais chaque étudiant ne peut avoir qu'une suele classe.
+
+Voici d'autres exemples de relation 1-to-many
+
+* écrivain/livres: un écrivain a plusieurs livres, un livre n'a qu'un seul écrivain
+* équipe football / joueur : une équipe de footballa à plusieurs joueurs/ un joueur n'a qu'une équipe de football.
+* être humain/ ville de naissance : un être humain à une ville de naissance/ une ville à plus d'un humain.
+
+### Relation many-to_many
+
+
+
+
+
 
 
 
